@@ -14,6 +14,8 @@ public:
 protected:
   void keyPressEvent(QKeyEvent* event);
 private:
+  void initGame();
+private:
   QVBoxLayout *m_main_layout;
   QVBoxLayout *m_block_layout;
 };

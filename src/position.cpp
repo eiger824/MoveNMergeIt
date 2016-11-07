@@ -49,13 +49,13 @@ void Position::setColor(COLOR color) {
     path="red.png";
     break;
   case GREEN:
-    path="green.png";
+    path="block2.png";
     break;
   case BLUE:
-    path="blue.png";
+    path="block1.png";
     break;
   case YELLOW:
-    path="yellow.png";
+    path="block3.png";
     break;
   case PINK:
     path="pink.png";
