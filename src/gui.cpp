@@ -12,7 +12,7 @@ Gui::Gui(QWidget* parent) : QWidget(parent) {
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(0);
     for (unsigned j=0; j< 4; ++j) {
-      layout->addWidget(new Position(i,j,BLUE));
+      layout->addWidget(new Position(i,j,BLOCK));
     }
     m_block_layout->addLayout(layout);
   }

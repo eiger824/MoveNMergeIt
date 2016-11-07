@@ -29,7 +29,8 @@ enum COLOR {
   PINK, //4
   BLACK, //5
   ORANGE, //6
-  WHITE //7
+  WHITE, //7
+  BLOCK //8
 };
 
 enum LEVEL {

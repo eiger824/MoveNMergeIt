@@ -48,6 +48,7 @@ install(FILES
 	images/red.png
 	images/yellow.png
 	images/white.png
+	images/block.png
 	DESTINATION ${PROJECT_BINARY_DIR}/images
 )
 
