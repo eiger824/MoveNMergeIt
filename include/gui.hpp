@@ -17,6 +17,9 @@ private:
   void move(const int direction);
   void updateCurrent();
   void generateNew();
+  void restart();
+  void print();
+  void sort(const int direction);
 private:
   QVBoxLayout *m_main_layout;
   QVBoxLayout *m_block_layout;

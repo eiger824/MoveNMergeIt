@@ -5,6 +5,8 @@
 
 Gui::Gui(QWidget* parent) : QWidget(parent) {
   setStyleSheet("background-color: #d4d4d4;");
+  setContentsMargins(0,0,0,0);
+  setFixedSize(574,592);
   m_main_layout = new QVBoxLayout;
   m_block_layout = new QVBoxLayout;
   QPixmap target;
@@ -39,29 +41,117 @@ void Gui::keyPressEvent(QKeyEvent *event) {
     move(UP);
   } else if (event->key() == DOWN) {
     move(DOWN);
+  } else if (event->key() == ENTER) {
+    restart();
+    return;
+  } else if (event->key() == ASCII_SPACE) {
+    print();
+    return;
   }
-  generateNew();
+  if (m_locked_pos.size() < 16)
+    generateNew();
 }
 
 void Gui::move(const int direction) {
   if (direction == UP) {
+    sort(UP);
+    unsigned k=0;
     for (unsigned i=0; i< m_locked_pos.size(); ++i) {
-      m_locked_pos.replace(i, qMakePair((unsigned int)0, m_locked_pos.at(i).second));
+      if (m_locked_pos.at(i).first > 0) {
+	m_locked_pos.replace(i, qMakePair((unsigned int)k, m_locked_pos.at(i).second));
+	++k;
+      }
     }
   } else if (direction == DOWN) {
+    sort(DOWN);
+    unsigned k=0;
     for (unsigned i=0; i< m_locked_pos.size(); ++i) {
-      m_locked_pos.replace(i, qMakePair((unsigned int)3, m_locked_pos.at(i).second));
+      if (m_locked_pos.at(i).first < 3) {
+	m_locked_pos.replace(i, qMakePair((unsigned int)3-k, m_locked_pos.at(i).second));
+	++k;
+      }
     }
   } else if (direction == LEFT) {
+    sort(LEFT);
+    unsigned k=0;
     for (unsigned i=0; i< m_locked_pos.size(); ++i) {
-      m_locked_pos.replace(i, qMakePair(m_locked_pos.at(i).first, (unsigned int)0));
+      if (m_locked_pos.at(i).second > 0) {
+	m_locked_pos.replace(i, qMakePair(m_locked_pos.at(i).first, (unsigned int)k));
+	++k;
+      }
     }
   } else if (direction == RIGHT) {
+    sort(RIGHT);
+    unsigned k=0;
     for (unsigned i=0; i< m_locked_pos.size(); ++i) {
-      m_locked_pos.replace(i, qMakePair(m_locked_pos.at(i).first, (unsigned int)3));
+      if (m_locked_pos.at(i).second < 3) {
+	m_locked_pos.replace(i, qMakePair(m_locked_pos.at(i).first, (unsigned int)3-k));
+	++k;
+      }
     }
   }
   updateCurrent();
+}
+
+void Gui::sort(const int direction) {
+  switch (direction) {
+  case RIGHT:
+    std::cout << "Sorting Right\n";
+    for (unsigned i=0; i<m_locked_pos.size(); ++i) {
+      for (unsigned j=i; j<m_locked_pos.size(); ++j) {
+	if (m_locked_pos.at(j).second > m_locked_pos.at(i).second) {
+	  QPair<unsigned int,unsigned int> aux =
+	    qMakePair(m_locked_pos.at(j).first, m_locked_pos.at(j).second);
+	  m_locked_pos.replace(j, m_locked_pos.at(i));
+	  m_locked_pos.replace(i, aux);
+	}
+      }
+    }
+    print();
+    break;
+  case LEFT:
+    std::cout << "Sorting Left\n";
+    for (unsigned i=0; i<m_locked_pos.size(); ++i) {
+      for (unsigned j=i; j<m_locked_pos.size(); ++j) {
+	if (m_locked_pos.at(j).second < m_locked_pos.at(i).second) {
+	  QPair<unsigned int,unsigned int> aux =
+	    qMakePair(m_locked_pos.at(j).first, m_locked_pos.at(j).second);
+	  m_locked_pos.replace(j, m_locked_pos.at(i));
+	  m_locked_pos.replace(i, aux);
+	}
+      }
+    }
+    print();
+    break;
+  case UP:
+    std::cout << "Sorting Up\n";
+    for (unsigned i=0; i<m_locked_pos.size(); ++i) {
+      for (unsigned j=i; j<m_locked_pos.size(); ++j) {
+	if (m_locked_pos.at(j).first < m_locked_pos.at(i).first) {
+	  QPair<unsigned int,unsigned int> aux =
+	    qMakePair(m_locked_pos.at(j).first, m_locked_pos.at(j).second);
+	  m_locked_pos.replace(j, m_locked_pos.at(i));
+	  m_locked_pos.replace(i, aux);
+	}
+      }
+    }
+    print();
+    break;
+  case DOWN:
+    std::cout << "Sorting Down\n";
+    for (unsigned i=0; i<m_locked_pos.size(); ++i) {
+      for (unsigned j=i; j<m_locked_pos.size(); ++j) {
+	if (m_locked_pos.at(j).first > m_locked_pos.at(i).first) {
+	  QPair<unsigned int,unsigned int> aux =
+	    qMakePair(m_locked_pos.at(j).first, m_locked_pos.at(j).second);
+	  m_locked_pos.replace(j, m_locked_pos.at(i));
+	  m_locked_pos.replace(i, aux);
+	}
+      }
+    }
+    print();
+    break;
+  }
 }
 
 void Gui::updateCurrent() {
@@ -89,4 +179,19 @@ void Gui::generateNew() {
   std::cout << "Generating new at:[" << r << "," << c << "], locked positions: "
 	    << m_locked_pos.size() << "\n";
   updateCurrent();
+}
+
+void Gui::restart() {
+  m_locked_pos.clear();
+  updateCurrent();
+  std::cout << "Starting again!\n"; 
+}
+
+void Gui::print() {
+  std::cout << "Locked positions:\n";
+  for (unsigned i=0; i<m_locked_pos.size(); ++i) {
+    std::cout << "[" << m_locked_pos.at(i).first << ","
+	      << m_locked_pos.at(i).second << "]\n";
+  }
+  std::cout << "----------------\n";
 }
