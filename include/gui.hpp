@@ -14,10 +14,13 @@ public:
 protected:
   void keyPressEvent(QKeyEvent* event);
 private:
-  void initGame();
+  void move(const int direction);
+  void updateCurrent();
+  void generateNew();
 private:
   QVBoxLayout *m_main_layout;
   QVBoxLayout *m_block_layout;
+  QList<QPair<unsigned int,unsigned int> >m_locked_pos;
 };
 
 #endif /*GUI_HPP_*/
