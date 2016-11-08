@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QLabel>
-#include <QPixmap>
 
 #include "definitions.hpp"
 
@@ -22,11 +21,14 @@ public:
   void setColor(COLOR color);
   COLOR getColor();
   QPair<unsigned int,unsigned int> getXY();
+  void doubleScore();
+  void free();
 private:
   unsigned int m_x;
   unsigned int m_y;
   COLOR m_color;
   bool m_locked;
+  unsigned m_score;
   QLabel *m_label;
   QVBoxLayout *m_main_layout;
 };

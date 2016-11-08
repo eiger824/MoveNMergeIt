@@ -1,8 +1,6 @@
 #include <iostream>
 #include "position.hpp"
 
-const QString& PREFIX = "images/";
-
 Position::Position(unsigned int i,
 		   unsigned int j,
 		   COLOR color,
@@ -10,12 +8,14 @@ Position::Position(unsigned int i,
 				     m_x(i),
 				     m_y(j),
 				     m_color(color),
+				     m_score(2),
 				     m_locked(false) {
-  //setFixedSize(50,50);
   setContentsMargins(0,0,0,0);
   m_main_layout = new QVBoxLayout;
   QPixmap target;
-  m_label = new QLabel();
+  m_label = new QLabel("2");
+  m_label->setStyleSheet("font: 40px arial bold;");
+  m_label->setAlignment(Qt::AlignCenter);
   m_main_layout->addWidget(m_label);
   setColor(color);
   setLayout(m_main_layout);
@@ -42,54 +42,51 @@ COLOR Position::getColor() {
   return m_color;
 }
 void Position::setColor(COLOR color) {
-  QString path;
-  QPixmap target;
   switch (color) {
   case RED:
-    path="red.png";
     this->setStyleSheet("background-color: red;");
     break;
   case GREEN:
-    path="block2.png";
     this->setStyleSheet("background-color: green;");
     break;
   case BLUE:
-    path="block1.png";
     this->setStyleSheet("background-color: blue;");
     break;
   case YELLOW:
-    path="block3.png";
     this->setStyleSheet("background-color: yellow;");
     break;
   case PINK:
-    path="pink.png";
     this->setStyleSheet("background-color: pink;");
     break;
   case BLACK:
-    path="black.png";
     this->setStyleSheet("background-color: black;");
     break;
   case ORANGE:
-    path="orange.png";
     this->setStyleSheet("background-color: orange;");
     break;
   case WHITE:
-    path="white.png";
+    m_label->setText("");
     this->setStyleSheet("background-color: white;");
     break;
   default:
-    path="block.png";
     this->setStyleSheet("background-color: white;");
     break;
-  }
-  if (target.load(PREFIX+path)) {
-    //m_label->setPixmap(target);
-  } else {
-    std::cerr << "Failed\n";
   }
   m_color = color;
 }
 
 QPair<unsigned int,unsigned int> Position::getXY() {
   return qMakePair(m_x,m_y);
+}
+
+void Position::doubleScore() {
+  m_score*=2;
+  m_label->setText(QString::number(m_score));
+}
+
+void Position::free() {
+  setColor(WHITE);
+  m_score = 2;
+  m_label->setText("");
+  m_locked = false;
 }

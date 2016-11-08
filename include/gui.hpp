@@ -19,6 +19,7 @@ private:
   void generateNew();
   void restart();
   void print();
+  bool merge(const int direction, unsigned int nr);
 private:
   QVBoxLayout *m_main_layout;
   QVBoxLayout *m_block_layout;
