@@ -47,34 +47,43 @@ void Position::setColor(COLOR color) {
   switch (color) {
   case RED:
     path="red.png";
+    this->setStyleSheet("background-color: red;");
     break;
   case GREEN:
     path="block2.png";
+    this->setStyleSheet("background-color: green;");
     break;
   case BLUE:
     path="block1.png";
+    this->setStyleSheet("background-color: blue;");
     break;
   case YELLOW:
     path="block3.png";
+    this->setStyleSheet("background-color: yellow;");
     break;
   case PINK:
     path="pink.png";
+    this->setStyleSheet("background-color: pink;");
     break;
   case BLACK:
     path="black.png";
+    this->setStyleSheet("background-color: black;");
     break;
   case ORANGE:
     path="orange.png";
+    this->setStyleSheet("background-color: orange;");
     break;
   case WHITE:
     path="white.png";
+    this->setStyleSheet("background-color: white;");
     break;
   default:
     path="block.png";
+    this->setStyleSheet("background-color: white;");
     break;
   }
   if (target.load(PREFIX+path)) {
-    m_label->setPixmap(target);
+    //m_label->setPixmap(target);
   } else {
     std::cerr << "Failed\n";
   }

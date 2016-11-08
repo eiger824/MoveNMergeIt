@@ -17,7 +17,7 @@ Gui::Gui(QWidget* parent) : QWidget(parent) {
       if (i==0 && j==0)
 	layout->addWidget(new Position(i,j,GREEN));
       else
-	layout->addWidget(new Position(i,j,BLOCK));
+	layout->addWidget(new Position(i,j,WHITE));
     }
     m_block_layout->addLayout(layout);
   }
@@ -50,108 +50,61 @@ void Gui::keyPressEvent(QKeyEvent *event) {
   }
   if (m_locked_pos.size() < 16)
     generateNew();
+  else
+    restart();
 }
 
 void Gui::move(const int direction) {
   if (direction == UP) {
-    sort(UP);
-    unsigned k=0;
-    for (unsigned i=0; i< m_locked_pos.size(); ++i) {
-      if (m_locked_pos.at(i).first > 0) {
-	m_locked_pos.replace(i, qMakePair((unsigned int)k, m_locked_pos.at(i).second));
-	++k;
+    unsigned min=0;
+    for (unsigned i=0; i<4; ++i) { // columns
+      for (unsigned j=0; j<4; ++j) { //rows
+	if (m_locked_pos.contains(qMakePair(j,i))) {
+	  std::cout << "[UP]Replacing (" << j << "," << i << ") -----> (" << min << "," << i <<")\n";
+	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(j,i)), qMakePair(min,i));
+	  ++min;
+	}
       }
+      min=0;
     }
   } else if (direction == DOWN) {
-    sort(DOWN);
-    unsigned k=0;
-    for (unsigned i=0; i< m_locked_pos.size(); ++i) {
-      if (m_locked_pos.at(i).first < 3) {
-	m_locked_pos.replace(i, qMakePair((unsigned int)3-k, m_locked_pos.at(i).second));
-	++k;
+    unsigned min=3;
+    for (unsigned i=0; i<4; ++i) { //columns
+      for (int j=3; j>=0; --j) { //rows
+	if (m_locked_pos.contains(qMakePair((unsigned int)j,i))) {
+	  std::cout << "[DOWN]Replacing (" << j << "," << i << ") -----> (" << min << "," << i <<")\n";
+	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair((unsigned int)j,i)), qMakePair(min,(unsigned int)i));
+	  --min;
+	}
       }
+      min=3;
     }
   } else if (direction == LEFT) {
-    sort(LEFT);
-    unsigned k=0;
-    for (unsigned i=0; i< m_locked_pos.size(); ++i) {
-      if (m_locked_pos.at(i).second > 0) {
-	m_locked_pos.replace(i, qMakePair(m_locked_pos.at(i).first, (unsigned int)k));
-	++k;
+    unsigned min=0;
+    for (unsigned i=0; i<4; ++i) { //rows
+      for (unsigned j=0; j<4; ++j) { //columns
+	if (m_locked_pos.contains(qMakePair(i,j))) {
+	  std::cout << "[LEFT]Replacing (" << i << "," << j << ") -----> (" << i << "," << min <<")\n";
+	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(i,j)), qMakePair(i,min));
+	  ++min;
+	}
       }
+      min=0;
     }
   } else if (direction == RIGHT) {
-    sort(RIGHT);
-    unsigned k=0;
-    for (unsigned i=0; i< m_locked_pos.size(); ++i) {
-      if (m_locked_pos.at(i).second < 3) {
-	m_locked_pos.replace(i, qMakePair(m_locked_pos.at(i).first, (unsigned int)3-k));
-	++k;
+    unsigned min=3;
+    for (unsigned i=0; i<4; ++i) { //rows
+      for (int j=3; j>=0; --j) { //columns
+	if (m_locked_pos.contains(qMakePair(i,(unsigned int)j))) {
+	  std::cout << "[RIGHT]Replacing (" << i << "," << j << ") -----> (" << i << "," << min <<")\n";
+	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(i,(unsigned int)j)), qMakePair(i,min));
+	  --min;
+	}
       }
+      min=3;
     }
   }
   updateCurrent();
-}
-
-void Gui::sort(const int direction) {
-  switch (direction) {
-  case RIGHT:
-    std::cout << "Sorting Right\n";
-    for (unsigned i=0; i<m_locked_pos.size(); ++i) {
-      for (unsigned j=i; j<m_locked_pos.size(); ++j) {
-	if (m_locked_pos.at(j).second > m_locked_pos.at(i).second) {
-	  QPair<unsigned int,unsigned int> aux =
-	    qMakePair(m_locked_pos.at(j).first, m_locked_pos.at(j).second);
-	  m_locked_pos.replace(j, m_locked_pos.at(i));
-	  m_locked_pos.replace(i, aux);
-	}
-      }
-    }
-    print();
-    break;
-  case LEFT:
-    std::cout << "Sorting Left\n";
-    for (unsigned i=0; i<m_locked_pos.size(); ++i) {
-      for (unsigned j=i; j<m_locked_pos.size(); ++j) {
-	if (m_locked_pos.at(j).second < m_locked_pos.at(i).second) {
-	  QPair<unsigned int,unsigned int> aux =
-	    qMakePair(m_locked_pos.at(j).first, m_locked_pos.at(j).second);
-	  m_locked_pos.replace(j, m_locked_pos.at(i));
-	  m_locked_pos.replace(i, aux);
-	}
-      }
-    }
-    print();
-    break;
-  case UP:
-    std::cout << "Sorting Up\n";
-    for (unsigned i=0; i<m_locked_pos.size(); ++i) {
-      for (unsigned j=i; j<m_locked_pos.size(); ++j) {
-	if (m_locked_pos.at(j).first < m_locked_pos.at(i).first) {
-	  QPair<unsigned int,unsigned int> aux =
-	    qMakePair(m_locked_pos.at(j).first, m_locked_pos.at(j).second);
-	  m_locked_pos.replace(j, m_locked_pos.at(i));
-	  m_locked_pos.replace(i, aux);
-	}
-      }
-    }
-    print();
-    break;
-  case DOWN:
-    std::cout << "Sorting Down\n";
-    for (unsigned i=0; i<m_locked_pos.size(); ++i) {
-      for (unsigned j=i; j<m_locked_pos.size(); ++j) {
-	if (m_locked_pos.at(j).first > m_locked_pos.at(i).first) {
-	  QPair<unsigned int,unsigned int> aux =
-	    qMakePair(m_locked_pos.at(j).first, m_locked_pos.at(j).second);
-	  m_locked_pos.replace(j, m_locked_pos.at(i));
-	  m_locked_pos.replace(i, aux);
-	}
-      }
-    }
-    print();
-    break;
-  }
 }
 
 void Gui::updateCurrent() {
