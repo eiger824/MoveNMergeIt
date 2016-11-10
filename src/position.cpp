@@ -92,3 +92,28 @@ void Position::free() {
   m_label->setText("");
   m_locked = false;
 }
+
+QString Position::getColorString() {
+  switch (m_color) {
+  case RED:
+    return "red";
+  case GREEN:
+    return "green";
+  case BLUE:
+    return "blue";
+  case YELLOW:
+    return "yellow";
+  case PINK:
+    return "pink";
+  case BLACK:
+    return "black";
+  case ORANGE:
+    return "orange";
+  case WHITE:
+    return "white";
+  case BLOCK:
+    return "block";
+  default:
+    return "unknown";
+  }
+}

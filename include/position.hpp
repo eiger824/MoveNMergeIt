@@ -20,6 +20,7 @@ public:
   void unLock();
   void setColor(COLOR color);
   COLOR getColor();
+  QString getColorString();
   QPair<unsigned int,unsigned int> getXY();
   void doubleScore();
   void free();

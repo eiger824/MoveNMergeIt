@@ -168,7 +168,8 @@ void Gui::print() {
   for (unsigned i=0; i<m_locked_pos.size(); ++i) {
     std::cout << "[" << m_locked_pos.at(i).first << ","
 	      << m_locked_pos.at(i).second << "] : color: "
-	      << castPosition(m_locked_pos.at(i).first, m_locked_pos.at(i).second)->getColor() << "\n";
+	      << castPosition(m_locked_pos.at(i).first, m_locked_pos.at(i).second)->getColorString().toStdString()
+	      << "\n";
   }
   std::cout << "----------------\n";
 }
