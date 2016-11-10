@@ -74,10 +74,13 @@ void Gui::move(const int direction) {
 	  ++min;
 	}
       }
+      if (merge(UP, i)) {
+	std::cout << "Success\n";
+      }
       min=0;
     }
   } else if (direction == DOWN) {
-     //column order not important, row order U--->D
+    //column order not important, row order U--->D
     unsigned min=3;
     for (unsigned i=0; i<4; ++i) {
       for (unsigned j=4; j>0; --j) {
@@ -89,6 +92,9 @@ void Gui::move(const int direction) {
 	  updated->setColor(position->getColor());
 	  --min;
 	}
+      }
+      if (merge(DOWN, i)) {
+	std::cout << "Success\n";
       }
       min=3;
     }
@@ -106,6 +112,9 @@ void Gui::move(const int direction) {
 	  ++min;
 	}
       }
+      if (merge(LEFT, i)) {
+	std::cout << "Success\n";
+      }
       min=0;
     }
   } else if (direction == RIGHT) {
@@ -121,6 +130,9 @@ void Gui::move(const int direction) {
 	  updated->setColor(position->getColor());
 	  --min;
 	}
+      }
+      if (merge(RIGHT, i)) {
+	std::cout << "Success\n";
       }
       min=3;
     }
@@ -182,13 +194,15 @@ bool Gui::merge(const int direction, unsigned int nr) {
     for (unsigned i=0; i < 3; ++i) {
       current = castPosition(i,nr);
       next = castPosition(i+1,nr);
-      if (current->getColor() == next->getColor()) {
+      if (current->getColor() == next->getColor() &&
+	  current->getColor() != WHITE) {
 	//same color, merge
 	current->free();
 	m_locked_pos.removeAt(m_locked_pos.indexOf(qMakePair(i,nr)));
 	next->doubleScore();
 	std::cout << "Merging!\n";
 	++cnt;
+	updateCurrent();
       }
     }
     if (cnt > 0) return true;
@@ -196,13 +210,15 @@ bool Gui::merge(const int direction, unsigned int nr) {
     for (unsigned i=3; i > 0; --i) {
       current = castPosition(i,nr);
       next = castPosition(i-1,nr);
-      if (current->getColor() == next->getColor()) {
+      if (current->getColor() == next->getColor() &&
+	  current->getColor() != WHITE) {
 	//same color, merge
 	current->free();
 	m_locked_pos.removeAt(m_locked_pos.indexOf(qMakePair(i,nr)));
 	next->doubleScore();
 	std::cout << "Merging!\n";
 	++cnt;
+	updateCurrent();
       }
     }
     if (cnt > 0) return true;
@@ -210,27 +226,31 @@ bool Gui::merge(const int direction, unsigned int nr) {
     for (unsigned i=3; i > 0; --i) {
       current = castPosition(nr,i);
       next = castPosition(nr,i-1);
-      if (current->getColor() == next->getColor()) {
+      if (current->getColor() == next->getColor() &&
+	  current->getColor() != WHITE) {
 	//same color, merge
 	current->free();
 	m_locked_pos.removeAt(m_locked_pos.indexOf(qMakePair(nr,i)));
 	next->doubleScore();
 	std::cout << "Merging!\n";
 	++cnt;
+	updateCurrent();
       }
     }
     if (cnt > 0) return true;
   } else if (direction == RIGHT) {
     for (unsigned i=0; i<3; ++i) {
       current = castPosition(nr,i);
-      next = castPosition(nr,i-1);
-      if (current->getColor() == next->getColor()) {
+      next = castPosition(nr,i+1);
+      if (current->getColor() == next->getColor() &&
+	  current->getColor() != WHITE) {
 	//same color, merge
 	current->free();
 	m_locked_pos.removeAt(m_locked_pos.indexOf(qMakePair(nr,i)));
 	next->doubleScore();
 	std::cout << "Merging!\n";
 	++cnt;
+	updateCurrent();
       }
     }
     if (cnt > 0) return true;
