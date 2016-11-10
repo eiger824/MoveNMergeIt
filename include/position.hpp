@@ -24,6 +24,8 @@ public:
   QPair<unsigned int,unsigned int> getXY();
   void doubleScore();
   void free();
+  void initScore();
+  unsigned getScore();
 private:
   unsigned int m_x;
   unsigned int m_y;

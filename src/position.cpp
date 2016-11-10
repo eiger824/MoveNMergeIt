@@ -14,7 +14,7 @@ Position::Position(unsigned int i,
   m_main_layout = new QVBoxLayout;
   QPixmap target;
   m_label = new QLabel("2");
-  m_label->setStyleSheet("font: 40px arial bold;");
+  m_label->setStyleSheet("font: 40px arial bold; color: white;");
   m_label->setAlignment(Qt::AlignCenter);
   m_main_layout->addWidget(m_label);
   setColor(color);
@@ -43,6 +43,10 @@ bool Position::isLocked() {
 COLOR Position::getColor() {
   return m_color;
 }
+void Position::initScore() {
+  m_label->setText(QString::number((m_score = 2)));
+}
+
 void Position::setColor(COLOR color) {
   switch (color) {
   case RED:
@@ -75,6 +79,7 @@ void Position::setColor(COLOR color) {
     break;
   }
   m_color = color;
+  m_label->setText(QString::number(m_score));
 }
 
 QPair<unsigned int,unsigned int> Position::getXY() {
@@ -82,8 +87,31 @@ QPair<unsigned int,unsigned int> Position::getXY() {
 }
 
 void Position::doubleScore() {
-  m_score*=2;
-  m_label->setText(QString::number(m_score));
+  m_label->setText(QString::number(m_score*=2));
+  if (m_score == 2 ||
+      m_score == 4) {
+    setColor(GREEN);
+  } else if (m_score == 8) {
+    setColor(PINK);
+  } else if (m_score == 16) {
+    setColor(BLUE);
+  } else if (m_score == 32) {
+    setColor(ORANGE);
+  } else if (m_score == 64) {
+    setColor(RED);
+  } else if (m_score == 128 ||
+	     m_score == 256 ||
+	     m_score == 512) {
+    setColor(YELLOW);
+  } else if (m_score == 1024) {
+    setColor(BLACK);
+  } else if (m_score == 2048) {
+    setColor(BLOCK);
+  } else if (m_score == 4096) {
+    setColor(BLOCK);
+  } else if (m_score == 8192) {
+    setColor(BLOCK);
+  }
 }
 
 void Position::free() {
@@ -116,4 +144,8 @@ QString Position::getColorString() {
   default:
     return "unknown";
   }
-}
+  }
+
+    unsigned Position::getScore() {
+    return m_score;
+  }
