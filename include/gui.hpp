@@ -21,8 +21,11 @@ private:
   void generateNew();
   void restart();
   void print();
+  void printScores();
   bool merge(const int direction, unsigned int nr);
   Position* castPosition(unsigned int i, unsigned int j);
+  int getNrMergeable(bool direction,
+		     unsigned int nr);
 private:
   QVBoxLayout *m_main_layout;
   QVBoxLayout *m_block_layout;

@@ -10,21 +10,15 @@ Gui::Gui(QWidget* parent) : QWidget(parent) {
   m_main_layout = new QVBoxLayout;
   m_block_layout = new QVBoxLayout;
   QPixmap target;
-  unsigned r = rand() % 4;
-  unsigned c = rand() % 4;
-  std::cout << "Starting initial at: " << r << "," << c << std::endl;
   for (unsigned i=0; i<4; ++i) {
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(0);
     for (unsigned j=0; j< 4; ++j) {
-      if (i==r && j==c)
-	layout->addWidget(new Position(i,j,GREEN));
-      else
-	layout->addWidget(new Position(i,j,WHITE));
+      layout->addWidget(new Position(i,j,WHITE));
     }
     m_block_layout->addLayout(layout);
   }
-  m_locked_pos.append(qMakePair((unsigned int)r,(unsigned int)c));
+  generateNew();
   m_main_layout->addLayout(m_block_layout);
   setWindowTitle("Move & Merge It!");
   setLayout(m_main_layout);
@@ -50,6 +44,7 @@ void Gui::keyPressEvent(QKeyEvent *event) {
     return;
   } else if (event->key() == ASCII_SPACE) {
     print();
+    printScores();
     return;
   }
   if (m_locked_pos.size() < 16) {
@@ -71,9 +66,12 @@ void Gui::move(const int direction) {
 	  position->lock(min,j);
 	  Position *updated = castPosition(min,j);
 	  updated->setColor(position->getColor());
+	  position->setColor(WHITE);
 	  ++min;
 	}
       }
+      std::cout << "Nr. mergeable blocks detected: "
+		<< getNrMergeable(false, i) << std::endl;
       if (merge(UP, i)) {
 	std::cout << "Success\n";
       } else {
@@ -92,9 +90,12 @@ void Gui::move(const int direction) {
 	  position->lock(min,i);
 	  Position *updated = castPosition(min,i);
 	  updated->setColor(position->getColor());
+	  position->setColor(WHITE);
 	  --min;
 	}
       }
+      std::cout << "Nr. mergeable blocks detected: "
+		<< getNrMergeable(false, i) << std::endl;
       if (merge(DOWN, i)) {
 	std::cout << "Success\n";
       } else {
@@ -113,9 +114,12 @@ void Gui::move(const int direction) {
 	  position->lock(i,min);
 	  Position *updated = castPosition(i,min);
 	  updated->setColor(position->getColor());
+	  position->setColor(WHITE);
 	  ++min;
 	}
       }
+      std::cout << "Nr. mergeable blocks detected: "
+		<< getNrMergeable(true, i) << std::endl;
       if (merge(LEFT, i)) {
 	std::cout << "Success\n";
       } else {
@@ -134,9 +138,12 @@ void Gui::move(const int direction) {
 	  position->lock(i,min);
 	  Position *updated = castPosition(i,min);
 	  updated->setColor(position->getColor());
+	  position->setColor(WHITE);
 	  --min;
 	}
       }
+      std::cout << "Nr. mergeable blocks detected: "
+		<< getNrMergeable(true, i) << std::endl;
       if (merge(RIGHT, i)) {
 	std::cout << "Success\n";
       } else {
@@ -181,7 +188,8 @@ void Gui::generateNew() {
 void Gui::restart() {
   m_locked_pos.clear();
   updateCurrent();
-  std::cout << "Starting again!\n"; 
+  std::cout << "Starting again!\n";
+  generateNew();
 }
 
 void Gui::print() {
@@ -277,4 +285,63 @@ Position* Gui::castPosition(unsigned int i, unsigned int j) {
 	    (qobject_cast<QLayout*>(m_block_layout->itemAt(i)->layout())
 	     ->itemAt(j)->widget()));
   else return NULL;
+}
+
+void Gui::printScores() {
+  std::cout << "Scores\n";
+  for (unsigned i=0; i< 4; ++i) {
+    for (unsigned j=0; j<4; ++j) {
+      Position *pos = castPosition(i,j);
+      if (pos->getColor() != WHITE)
+	std::cout << pos->getScore() << " ";
+      else
+	std::cout << "* ";
+    }
+    std::cout << "\n";
+  }
+}
+
+int Gui::getNrMergeable(bool direction,
+			unsigned int nr) {
+  std::cout << "Nr.: " << nr << std::endl;
+  unsigned cnt=1;
+  if (direction) { //rows
+    for (unsigned i=0; i<4; ++i) {
+      Position *pos = castPosition(nr,i);
+      if (pos->getColor() != WHITE) {
+	for (unsigned j=i+1; j < 4; ++j) {
+	  Position *next = castPosition(nr,j);
+	  if (next->getColor() == pos->getColor())
+	    ++cnt;
+	  //but if an stranger is encountered in the middle
+	  else
+	    if (next->getColor() != WHITE)
+	      return -1;
+	}
+      }
+    }
+    if (cnt > 1)
+      return cnt;
+  } else {
+    for (unsigned i=0; i<4; ++i) { //cols
+      Position *pos = castPosition(i,nr);
+      if (pos->getColor() != WHITE) {
+	for (unsigned j=i+1; j < 4; ++j) {
+	  std::cout << "(i,j):  (" << i << "," << j <<")\n";
+	  Position *next = castPosition(j,nr);
+	  if (next->getColor() == pos->getColor()) {
+	    ++cnt;
+	    //but if an stranger is encountered in the middle
+	  } else {
+	    if (next->getColor() != WHITE) {
+	      return -1;
+	    }
+	  }
+	}
+      }
+    }
+    if (cnt > 1)
+      return cnt; 
+  }
+  return -1;
 }
