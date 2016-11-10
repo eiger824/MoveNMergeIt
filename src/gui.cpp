@@ -12,6 +12,7 @@ Gui::Gui(QWidget* parent) : QWidget(parent) {
   QPixmap target;
   unsigned r = rand() % 4;
   unsigned c = rand() % 4;
+  std::cout << "Starting initial at: " << r << "," << c << std::endl;
   for (unsigned i=0; i<4; ++i) {
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(0);
@@ -23,7 +24,7 @@ Gui::Gui(QWidget* parent) : QWidget(parent) {
     }
     m_block_layout->addLayout(layout);
   }
-  m_locked_pos.append(qMakePair((unsigned int)0,(unsigned int)0));
+  m_locked_pos.append(qMakePair((unsigned int)r,(unsigned int)c));
   m_main_layout->addLayout(m_block_layout);
   setWindowTitle("Move & Merge It!");
   setLayout(m_main_layout);
@@ -68,6 +69,8 @@ void Gui::move(const int direction) {
 	if (m_locked_pos.contains(qMakePair(j,i))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(j,i)), qMakePair(min,i));
 	  position->lock(min,j);
+	  Position *updated = castPosition(min,j);
+	  updated->setColor(position->getColor());
 	  ++min;
 	}
       }
@@ -82,6 +85,8 @@ void Gui::move(const int direction) {
 	if (m_locked_pos.contains(qMakePair(j-1,i))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(j-1,i)), qMakePair(min,i));
 	  position->lock(min,i);
+	  Position *updated = castPosition(min,i);
+	  updated->setColor(position->getColor());
 	  --min;
 	}
       }
@@ -96,6 +101,8 @@ void Gui::move(const int direction) {
 	if (m_locked_pos.contains(qMakePair(i,j))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(i,j)), qMakePair(i,min));
 	  position->lock(i,min);
+	  Position *updated = castPosition(i,min);
+	  updated->setColor(position->getColor());
 	  ++min;
 	}
       }
@@ -110,6 +117,8 @@ void Gui::move(const int direction) {
 	if (m_locked_pos.contains(qMakePair(i,j-1))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(i,j-1)), qMakePair(i,min));
 	  position->lock(i,min);
+	  Position *updated = castPosition(i,min);
+	  updated->setColor(position->getColor());
 	  --min;
 	}
       }
@@ -124,7 +133,7 @@ void Gui::updateCurrent() {
     for (unsigned j=0; j<4; ++j) {
       Position *position = castPosition(i,j);
       if (m_locked_pos.contains(qMakePair(i,j))) {
-	position->setColor(GREEN);
+	position->setColor(position->getColor());
       } else {
 	position->setColor(WHITE);
       }
@@ -140,7 +149,9 @@ void Gui::generateNew() {
     c = rand() % 4;
   } while(m_locked_pos.contains(qMakePair(r,c)));
   m_locked_pos.append(qMakePair(r,c));
-  
+  //and specify a color
+  Position *current = castPosition(r,c);
+  current->setColor((COLOR)(rand() % 7));
   std::cout << "Generating new at:[" << r << "," << c << "], locked positions: "
 	    << m_locked_pos.size() << "\n";
   updateCurrent();
@@ -156,7 +167,8 @@ void Gui::print() {
   std::cout << "Locked positions:\n";
   for (unsigned i=0; i<m_locked_pos.size(); ++i) {
     std::cout << "[" << m_locked_pos.at(i).first << ","
-	      << m_locked_pos.at(i).second << "]\n";
+	      << m_locked_pos.at(i).second << "] : color: "
+	      << castPosition(m_locked_pos.at(i).first, m_locked_pos.at(i).second)->getColor() << "\n";
   }
   std::cout << "----------------\n";
 }
