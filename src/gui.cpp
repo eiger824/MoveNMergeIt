@@ -64,8 +64,7 @@ void Gui::move(const int direction) {
     unsigned min=0;
     for (unsigned i=0; i<4; ++i) {
       for (unsigned j=0; j<4; ++j) {
-	Position *position =
-	  qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(j)->layout())->itemAt(i)->widget());
+	Position *position = castPosition(j,i);
 	if (m_locked_pos.contains(qMakePair(j,i))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(j,i)), qMakePair(min,i));
 	  position->lock(min,j);
@@ -79,8 +78,7 @@ void Gui::move(const int direction) {
     unsigned min=3;
     for (unsigned i=0; i<4; ++i) {
       for (unsigned j=4; j>0; --j) {
-	Position *position =
-	  qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(j-1)->layout())->itemAt(i)->widget());
+	Position *position = castPosition(j-1,i);
 	if (m_locked_pos.contains(qMakePair(j-1,i))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(j-1,i)), qMakePair(min,i));
 	  position->lock(min,i);
@@ -94,8 +92,7 @@ void Gui::move(const int direction) {
     unsigned min=0;
     for (unsigned i=0; i<4; ++i) {
       for (unsigned j=0; j<4; ++j) {
-	Position *position =
-	  qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(i)->layout())->itemAt(j)->widget());
+	Position *position = castPosition(i,j);
 	if (m_locked_pos.contains(qMakePair(i,j))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(i,j)), qMakePair(i,min));
 	  position->lock(i,min);
@@ -109,8 +106,7 @@ void Gui::move(const int direction) {
     unsigned min=3;
     for (unsigned i=0; i<4; ++i) {
       for (unsigned j=4; j>0; --j) {
-	Position *position =
-	  qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(i)->layout())->itemAt(j-1)->widget());
+	Position *position = castPosition(i,j-1);
 	if (m_locked_pos.contains(qMakePair(i,j-1))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(i,j-1)), qMakePair(i,min));
 	  position->lock(i,min);
@@ -126,8 +122,7 @@ void Gui::move(const int direction) {
 void Gui::updateCurrent() {
   for (unsigned i=0; i<4; ++i) {
     for (unsigned j=0; j<4; ++j) {
-      Position *position =
-	qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(i)->layout())->itemAt(j)->widget());
+      Position *position = castPosition(i,j);
       if (m_locked_pos.contains(qMakePair(i,j))) {
 	position->setColor(GREEN);
       } else {
@@ -172,10 +167,8 @@ bool Gui::merge(const int direction, unsigned int nr) {
   unsigned cnt=0;
   if (direction == DOWN) {
     for (unsigned i=0; i < 3; ++i) {
-      current =
-	qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(i)->layout())->itemAt(nr)->widget());
-      next =
-	qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(i+1)->layout())->itemAt(nr)->widget());
+      current = castPosition(i,nr);
+      next = castPosition(i+1,nr);
       if (current->getColor() == next->getColor()) {
 	//same color, merge
 	current->free();
@@ -188,10 +181,8 @@ bool Gui::merge(const int direction, unsigned int nr) {
     if (cnt > 0) return true;
   } else if (direction == UP) {
     for (unsigned i=3; i > 0; --i) {
-      current =
-	qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(i)->layout())->itemAt(nr)->widget());
-      next =
-	qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(i-1)->layout())->itemAt(nr)->widget());
+      current = castPosition(i,nr);
+      next = castPosition(i-1,nr);
       if (current->getColor() == next->getColor()) {
 	//same color, merge
 	current->free();
@@ -204,10 +195,8 @@ bool Gui::merge(const int direction, unsigned int nr) {
     if (cnt > 0) return true;
   } else if (direction == LEFT) {
     for (unsigned i=3; i > 0; --i) {
-      current =
-	qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(nr)->layout())->itemAt(i)->widget());
-      next =
-	qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(nr)->layout())->itemAt(i-1)->widget());
+      current = castPosition(nr,i);
+      next = castPosition(nr,i-1);
       if (current->getColor() == next->getColor()) {
 	//same color, merge
 	current->free();
@@ -220,10 +209,8 @@ bool Gui::merge(const int direction, unsigned int nr) {
     if (cnt > 0) return true;
   } else if (direction == RIGHT) {
     for (unsigned i=0; i<3; ++i) {
-      current =
-	qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(nr)->layout())->itemAt(i)->widget());
-      next =
-	qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(nr)->layout())->itemAt(i-1)->widget());
+      current = castPosition(nr,i);
+      next = castPosition(nr,i-1);
       if (current->getColor() == next->getColor()) {
 	//same color, merge
 	current->free();
@@ -236,4 +223,12 @@ bool Gui::merge(const int direction, unsigned int nr) {
     if (cnt > 0) return true;
   }
   return false;
+}
+
+Position* Gui::castPosition(unsigned int i, unsigned int j) {
+  if (0<=i<=3 || 0<=j<=3)
+    return (qobject_cast<Position*>
+	    (qobject_cast<QLayout*>(m_block_layout->itemAt(i)->layout())
+	     ->itemAt(j)->widget()));
+  else return NULL;
 }

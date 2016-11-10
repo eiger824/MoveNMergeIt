@@ -6,6 +6,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
+#include "position.hpp"
+
 class Gui : public QWidget {
   Q_OBJECT
 public:
@@ -20,6 +22,7 @@ private:
   void restart();
   void print();
   bool merge(const int direction, unsigned int nr);
+  Position* castPosition(unsigned int i, unsigned int j);
 private:
   QVBoxLayout *m_main_layout;
   QVBoxLayout *m_block_layout;
