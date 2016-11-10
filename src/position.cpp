@@ -18,6 +18,8 @@ Position::Position(unsigned int i,
   m_label->setAlignment(Qt::AlignCenter);
   m_main_layout->addWidget(m_label);
   setColor(color);
+  if (color != WHITE)
+    m_locked = true;
   setLayout(m_main_layout);
 }
 

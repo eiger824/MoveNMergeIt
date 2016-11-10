@@ -10,11 +10,13 @@ Gui::Gui(QWidget* parent) : QWidget(parent) {
   m_main_layout = new QVBoxLayout;
   m_block_layout = new QVBoxLayout;
   QPixmap target;
+  unsigned r = rand() % 4;
+  unsigned c = rand() % 4;
   for (unsigned i=0; i<4; ++i) {
     QHBoxLayout *layout = new QHBoxLayout;
     layout->setSpacing(0);
     for (unsigned j=0; j< 4; ++j) {
-      if (i==0 && j==0)
+      if (i==r && j==c)
 	layout->addWidget(new Position(i,j,GREEN));
       else
 	layout->addWidget(new Position(i,j,WHITE));
@@ -49,82 +51,71 @@ void Gui::keyPressEvent(QKeyEvent *event) {
     print();
     return;
   }
-  if (m_locked_pos.size() < 16)
+  if (m_locked_pos.size() < 16) {
     generateNew();
-  else
+  } else {
     restart();
+  }
 }
 
 void Gui::move(const int direction) {
   if (direction == UP) {
+    //column order not important, row order U--->D
     unsigned min=0;
-    for (unsigned i=0; i<4; ++i) { // columns
-      for (unsigned j=0; j<4; ++j) { //rows
+    for (unsigned i=0; i<4; ++i) {
+      for (unsigned j=0; j<4; ++j) {
+	Position *position =
+	  qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(j)->layout())->itemAt(i)->widget());
 	if (m_locked_pos.contains(qMakePair(j,i))) {
-	  std::cout << "[UP]Replacing (" << j << "," << i << ") -----> ("
-		    << min << "," << i <<")\n";
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(j,i)), qMakePair(min,i));
-	  //and update coordinates in position object
-	  
+	  position->lock(min,j);
 	  ++min;
 	}
-      }
-      if (merge(UP,i)) {
-	std::cout << "merge occurring in current column\n";
       }
       min=0;
     }
   } else if (direction == DOWN) {
+     //column order not important, row order U--->D
     unsigned min=3;
-    for (unsigned i=0; i<4; ++i) { //columns
-      for (int j=3; j>=0; --j) { //rows
-	if (m_locked_pos.contains(qMakePair((unsigned int)j,i))) {
-	  std::cout << "[DOWN]Replacing (" << j << "," << i << ") -----> ("
-		    << min << "," << i <<")\n";
-	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair((unsigned int)j,i)), qMakePair(min,(unsigned int)i));
-	  //and update coordinates in position object
-	  
+    for (unsigned i=0; i<4; ++i) {
+      for (unsigned j=4; j>0; --j) {
+	Position *position =
+	  qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(j-1)->layout())->itemAt(i)->widget());
+	if (m_locked_pos.contains(qMakePair(j-1,i))) {
+	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(j-1,i)), qMakePair(min,i));
+	  position->lock(min,i);
 	  --min;
 	}
-      }
-      if (merge(DOWN,i)) {
-	std::cout << "merge occurring in current column\n";
       }
       min=3;
     }
   } else if (direction == LEFT) {
+    //row order not important, column order L--->R
     unsigned min=0;
-    for (unsigned i=0; i<4; ++i) { //rows
-      for (unsigned j=0; j<4; ++j) { //columns
+    for (unsigned i=0; i<4; ++i) {
+      for (unsigned j=0; j<4; ++j) {
+	Position *position =
+	  qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(i)->layout())->itemAt(j)->widget());
 	if (m_locked_pos.contains(qMakePair(i,j))) {
-	  std::cout << "[LEFT]Replacing (" << i << "," << j << ") -----> ("
-		    << i << "," << min <<")\n";
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(i,j)), qMakePair(i,min));
-	  //and update coordinates in position object
-	  
+	  position->lock(i,min);
 	  ++min;
 	}
-      }
-      if (merge(LEFT,i)) {
-	std::cout << "merge occurring in current column\n";
       }
       min=0;
     }
   } else if (direction == RIGHT) {
+    //row order not important, column order L--->R
     unsigned min=3;
-    for (unsigned i=0; i<4; ++i) { //rows
-      for (int j=3; j>=0; --j) { //columns
-	if (m_locked_pos.contains(qMakePair(i,(unsigned int)j))) {
-	  std::cout << "[RIGHT]Replacing (" << i << "," << j << ") -----> ("
-		    << i << "," << min <<")\n";
-	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(i,(unsigned int)j)), qMakePair(i,min));
-	  //and update coordinates in position object
-	  
+    for (unsigned i=0; i<4; ++i) {
+      for (unsigned j=4; j>0; --j) {
+	Position *position =
+	  qobject_cast<Position*>(qobject_cast<QLayout*>(m_block_layout->itemAt(i)->layout())->itemAt(j-1)->widget());
+	if (m_locked_pos.contains(qMakePair(i,j-1))) {
+	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(i,j-1)), qMakePair(i,min));
+	  position->lock(i,min);
 	  --min;
 	}
-      }
-      if (merge(RIGHT,i)) {
-	std::cout << "merge occurring in current column\n";
       }
       min=3;
     }
@@ -140,7 +131,7 @@ void Gui::updateCurrent() {
       if (m_locked_pos.contains(qMakePair(i,j))) {
 	position->setColor(GREEN);
       } else {
-	position->setColor(BLOCK);
+	position->setColor(WHITE);
       }
     }
   }
