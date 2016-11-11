@@ -64,9 +64,11 @@ void Gui::move(const int direction) {
 	if (m_locked_pos.contains(qMakePair(j,i))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(j,i)), qMakePair(min,i));
 	  position->lock(min,j);
-	  Position *updated = castPosition(min,j);
-	  updated->setColor(position->getColor());
-	  position->setColor(WHITE);
+	  if (qMakePair(j,i) != qMakePair(min,i)) {
+	    Position *updated = castPosition(min,j);
+	    updated->setColor(position->getColor());
+	    position->setColor(WHITE);
+	  }
 	  ++min;
 	}
       }
@@ -88,9 +90,11 @@ void Gui::move(const int direction) {
 	if (m_locked_pos.contains(qMakePair(j-1,i))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(j-1,i)), qMakePair(min,i));
 	  position->lock(min,i);
-	  Position *updated = castPosition(min,i);
-	  updated->setColor(position->getColor());
-	  position->setColor(WHITE);
+	  if (qMakePair(j-1,i) != qMakePair(min,i)) {
+	    Position *updated = castPosition(min,i);
+	    updated->setColor(position->getColor());
+	    position->setColor(WHITE);
+	  }
 	  --min;
 	}
       }
@@ -112,9 +116,11 @@ void Gui::move(const int direction) {
 	if (m_locked_pos.contains(qMakePair(i,j))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(i,j)), qMakePair(i,min));
 	  position->lock(i,min);
-	  Position *updated = castPosition(i,min);
-	  updated->setColor(position->getColor());
-	  position->setColor(WHITE);
+	  if (qMakePair(i,j) != qMakePair(i,min)) {
+	    Position *updated = castPosition(i,min);
+	    updated->setColor(position->getColor());
+	    position->setColor(WHITE);
+	  }
 	  ++min;
 	}
       }
@@ -128,7 +134,7 @@ void Gui::move(const int direction) {
       min=0;
     }
   } else if (direction == RIGHT) {
-    //row order not important, column order L--->R
+    //row order not important, column order R--->L
     unsigned min=3;
     for (unsigned i=0; i<4; ++i) {
       for (unsigned j=4; j>0; --j) {
@@ -136,9 +142,11 @@ void Gui::move(const int direction) {
 	if (m_locked_pos.contains(qMakePair(i,j-1))) {
 	  m_locked_pos.replace(m_locked_pos.indexOf(qMakePair(i,j-1)), qMakePair(i,min));
 	  position->lock(i,min);
-	  Position *updated = castPosition(i,min);
-	  updated->setColor(position->getColor());
-	  position->setColor(WHITE);
+	  if (qMakePair(i,j-1) != qMakePair(i,min)) {
+	    Position *updated = castPosition(i,min);
+	    updated->setColor(position->getColor());
+	    position->setColor(WHITE);
+	  }
 	  --min;
 	}
       }
