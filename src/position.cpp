@@ -87,7 +87,7 @@ QPair<unsigned int,unsigned int> Position::getXY() {
 }
 
 void Position::doubleScore() {
-  m_label->setText(QString::number(m_score*=2));
+  m_score*=2;
   if (m_score == 2 ||
       m_score == 4) {
     setColor(GREEN);
